@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Skytown MC | Parts Compatibility</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    padding: 15px;
+
+    /* Background image with dim overlay */
+    background-image: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)), 
+                      url('https://postimg.cc/2bmNVNvT/Background.jpg');
+    background-size: cover;              
+    background-position: center;  
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+.container {
+    max-width: 700px;
+    margin: auto;
+    background: rgba(255,255,255,0.95);
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.header {
+    background: #111;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.content {
+    padding: 20px;
+}
+
+label {
+    font-weight: bold;
+    margin-top: 10px;
+    display: block;
+}
+
+select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: #111;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #333;
+}
+
+.parts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.part-card {
+    background: #fafafa;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    border: 2px solid #ccc;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.part-title {
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+    border-bottom: 1px solid #aaa;
+    padding-bottom: 5px;
+    width: 100%;
+    text-align: center;
+}
+
+.note {
+    font-size: 12px;
+    color: #777;
+    margin: 20px;
+    text-align: center;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Skytown MC<br>Parts Compatibility Checker</h1>
+    </div>
+
+    <div class="content">
+        <label>Select Motor Model</label>
+        <select id="motorSelect">
+            <option value="">-- Select Motor --</option>
+        </select>
+
+        <label>Select Part</label>
+        <select id="partSelect" disabled>
+            <option value="">-- Select Part --</option>
+        </select>
+
+        <button id="refreshBtn">Refresh</button>
+
+        <div class="parts-grid" id="partsList"></div>
+    </div>
+
+    <div class="note">
+        ⚠ Compatibility is for reference only. Actual fitment may vary.
+    </div>
+</div>
+
+<script>
+const data = {
+    "KYMCO Skytown": {
+        "CVT Belt": [
+            { name: "Bando CVT Belt" }
+        ],
+        "Center Spring": [
+            { name: "Click V1 & V2 125" }
+        ]
+    }
+};
+
+const motorSelect = document.getElementById("motorSelect");
+const partSelect = document.getElementById("partSelect");
+const partsList = document.getElementById("partsList");
+const refreshBtn = document.getElementById("refreshBtn");
+
+// Load motor list
+Object.keys(data).forEach(motor => {
+    const option = document.createElement("option");
+    option.value = motor;
+    option.textContent = motor;
+    motorSelect.appendChild(option);
+});
+
+// Motor change
+motorSelect.addEventListener("change", () => {
+    partSelect.innerHTML = '<option value="">-- Select Part --</option>';
+    partsList.innerHTML = "";
+    partSelect.disabled = true;
+
+    const motor = motorSelect.value;
+    if (!motor) return;
+
+    Object.keys(data[motor]).forEach(part => {
+        const option = document.createElement("option");
+        option.value = part;
+        option.textContent = part;
+        partSelect.appendChild(option);
+    });
+
+    partSelect.disabled = false;
+});
+
+// Part change
+partSelect.addEventListener("change", () => {
+    partsList.innerHTML = "";
+    const motor = motorSelect.value;
+    const part = partSelect.value;
+    if (!part) return;
+
+    const items = data[motor][part];
+    if (!items || items.length === 0) {
+        const msg = document.createElement("div");
+        msg.className = "note";
+        msg.textContent = "⚠ No compatible parts available yet for this selection.";
+        partsList.appendChild(msg);
+        return;
+    }
+
+    items.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "part-card";
+        card.innerHTML = `<div class="part-title">${item.name}</div>`;
+        partsList.appendChild(card);
+    });
+});
+
+// Refresh button
+refreshBtn.addEventListener("click", () => {
+    motorSelect.value = "";
+    partSelect.innerHTML = '<option value="">-- Select Part --</option>';
+    partSelect.disabled = true;
+    partsList.innerHTML = "";
+});
+</script>
+
+</body>
+</html>
